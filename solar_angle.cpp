@@ -42,15 +42,15 @@ int main(int argc, char **argv){
 
   double w = 2.0 * M_PI / 365.0;
   double delta = (0.33281 - 22.984*cos(w*J) - 0.34990*cos(2*w*J) - 0.13980*cos(3*w*J)
-    + 3.7872*sin(w*J) + 0.03250*sin(2*w*J) + 0.07187*sin(3*w*J))/180.0*M_PI;//太陽赤緯[rad]
+                  + 3.7872*sin(w*J) + 0.03250*sin(2*w*J) + 0.07187*sin(3*w*J)) * DEG2RAD; /* 太陽赤緯[rad] */
 
   double e = 0.0072*cos(w*J) - 0.0528*cos(2*w*J) - 0.0012*cos(3*w*J)
-   - 0.1229*sin(w*J) - 0.1565*sin(2*w*J) - 0.0041*sin(3*w*J);//均時差[h]
+    - 0.1229*sin(w*J) - 0.1565*sin(2*w*J) - 0.0041*sin(3*w*J); /* 均時差[h] */
 
-  double T = Ts + (th/M_PI*180.0 - 135.0)/15.0 + e;
-  double t = (15.0*T - 180.0)/180.0*M_PI;//時角[rad]
+  double T = Ts + (th *RAD2DEG - 135.0)/15.0 + e;
+  double t = (15.0*T - 180.0) *DEG2RAD; /* 時角[rad] */
 
-  double h = asin(sin(phi)*sin(delta) + cos(phi)*cos(delta)*cos(t));//太陽高度角[rad]
+  double h = asin(sin(phi)*sin(delta) + cos(phi)*cos(delta)*cos(t)); /* 太陽高度角[rad] */
   double th_v = M_PI - h;//太陽天頂角[rad]
 
 
