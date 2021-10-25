@@ -62,6 +62,7 @@ int main(int argc, char **argv){
   std::cout << "A[deg]=" << A*180.0/M_PI << std::endl;
   std::cout << "h[rad]=" << h << std::endl;
   std::cout << "A[rad]=" << A << std::endl;
+  std::cout << "th_v=" << th_v << std::endl;
 
   return 0;
 }
