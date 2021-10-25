@@ -41,9 +41,9 @@ int main(int argc, char **argv){
   y1 = (y2 - y1)/norm;
   z1 = (z2 - z1)/norm;
 
-  std::cout << "x1=" << k*x1 << std::endl;
-  std::cout << "y1=" << k*y1 << std::endl;
-  std::cout << "z1=" << k*z1 << std::endl;
+  std::cout << "x1=" << x1 << std::endl;
+  std::cout << "y1=" << y1 << std::endl;
+  std::cout << "z1=" << z1 << std::endl;
 
   return 0;
 }
