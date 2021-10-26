@@ -19,7 +19,7 @@ int main(int argc, char **argv){
   double phi = std::stod(str_lon) * DEG2RAD;/*地球の球面座標におけるφ[rad]*/
   double h_pmc = 80.0;/*PMCの高度[km]*/
   double r1 = 6.38*1e3 + h_pmc;/*地球の半径[km]*/
-  double th_v = std::stod(str_th_v) + M_PI/2.0;/*太陽天頂角[rad]*/
+  double th_v = std::stod(str_th_v) + M_PI/2.0;/*太陽天頂角[rad] PI/2で太陽の位置を修正*/
   double A = std::stod(str_A);/*方位角、北=0、東=90、南=180、西=270*/
   double r2 = 1.5e8;/*地球から太陽までの半径[km]*/
 
