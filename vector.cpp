@@ -1,48 +1,68 @@
-#include<iostream>
-#include<fstream>
-#include <string>
-#include <sstream>
-#include <cmath>
-#include <math.h>
+#include "solar_angle.h"
 
 int main(int argc, char **argv){
 
-  constexpr double DEG2RAD { M_PI / 180.0 };
-  constexpr double RAD2DEG { 1.0 / DEG2RAD };
+  std::string str_month(argv[1]);
+  std::string str_day(argv[2]);
+  std::string str_hour(argv[3]);
+  std::string str_lat(argv[4]);
+  std::string str_lon(argv[5]);
 
-  std::string str_th_v(argv[1]);
-  std::string str_A(argv[2]);
-  std::string str_lat(argv[3]);
-  std::string str_lon(argv[4]);
+  double th_h, A = 0.0;/*太陽天頂角、方位角*/
+  matrix angle;
+  double lat = std::stod(str_lat);
+  double lon = std::stod(str_lon);
 
-  double th = M_PI/2 - std::stod(str_lat) * DEG2RAD;
-  double phi = std::stod(str_lon) * DEG2RAD;
-  double r1 = 6.38*1e3;/*地球の半径[km]*/
-  double th_v = std::stod(str_th_v);/*太陽天頂角[rad]*/
-  double A = std::stod(str_A);/*方位角、北=0、東=90、南=180、西=270*/
-  double r2 = 1.5e8;/*地球から太陽までの半径[km]*/
+  angle = solar_angle(std::stoi(str_month),std::stoi(str_day),
+  std::stod(str_hour),lat,lon,angle);
 
-  /*観測点の座標*/
-  double x1 = r1*sin(th)*cos(phi);
-  double y1 = r1*sin(th)*sin(phi);
-  double z1 = r1*cos(th);
+  std::cout << "lat=" << lat << std::endl;
+  std::cout << "lon=" << lon << std::endl;
+  std::cout << "hour=" << std::stod(str_hour) << std::endl;
 
-  /*太陽の座標*/
-  double x2 = r2*sin(th_v)*cos(A);
-  double y2 = r2*sin(th_v)*sin(A);
-  double z2 = r2*cos(th_v);
+  th_h = angle.e[0];
+  A = angle.e[1] + M_PI;/*南を基準に西側正*/
 
-  double norm = std::pow((x2 - x1)*(x2 - x1)
-   + (y2 - y1)*(y2 - y1) + (z2 - z1)*(z2 - z1), 0.5);
+  std::cout << "th_h[deg]=" << th_h*RAD2DEG << std::endl;
+  std::cout << "A[deg]=" << A*RAD2DEG << std::endl;
 
-  /*観測点から太陽への単位ベクトル*/
-  x1 = (x2 - x1)/norm;
-  y1 = (y2 - y1)/norm;
-  z1 = (z2 - z1)/norm;
+  double th = (90 - lat)*DEG2RAD;/*球面座標系のθ*/
+  double ph = (lon - 140.7)*DEG2RAD;/*球面座標系のφ*/
 
-  std::cout << "x1=" << x1 << std::endl;
-  std::cout << "y1=" << y1 << std::endl;
-  std::cout << "z1=" << z1 << std::endl;
+  /*球面座標系の単位ベクトル*/
+  matrix r_v;
+  r_v.e[0] = sin(th)*cos(ph);
+  r_v.e[1] = sin(th)*sin(ph);
+  r_v.e[2] = cos(th);
+
+  /*今回使わない
+  matrix th_v;
+  th_v.e[0] = cos(th)*cos(ph);
+  th_v.e[1] = cos(th)*sin(ph);
+  th_v.e[2] = -sin(th);
+  */
+
+  matrix ph_v;
+  ph_v.e[0] = -sin(ph);
+  ph_v.e[1] = cos(ph);
+  ph_v.e[2] = 0.0;
+
+  /*太陽へ向かう単位ベクトル*/
+  matrix s;
+  for(int i=0; i<3; i++){
+    s.e[i] = mat_pro(R(r_v,A),R(ph_v,th_h)).e[i][0]*r_v.e[0]
+    + mat_pro(R(r_v,A),R(ph_v,th_h)).e[i][1]*r_v.e[1]
+    + mat_pro(R(r_v,A),R(ph_v,th_h)).e[i][2]*r_v.e[2];
+  }
+
+  std::ofstream ofs("solar.dat", std::ios::app);
+  ofs << std::stod(str_hour) << " " << lat << " " << lon << " " << s.e[0] << " " << s.e[1]
+  << " " << s.e[2] << " " << th_h*RAD2DEG << " " << A*RAD2DEG << "\n";
+  ofs.close();
+
+  std::cout << "sx=" << s.e[0] << std::endl;
+  std::cout << "sy=" << s.e[1] << std::endl;
+  std::cout << "sz=" <<s.e[2] << std::endl;
 
   return 0;
 }
